@@ -4,7 +4,6 @@ import { Route, Switch, useCurrentRoute } from '@maksimr/ui/react/Router';
 import React, { useCallback } from 'react';
 import { denormalize } from 'normalizr';
 import { ISSUE_SCHEMA } from '../schema';
-import assert from 'assert';
 
 export function App() {
   const [{path}] = useStore();
@@ -23,10 +22,7 @@ export function App() {
 function Issue() {
   const [data] = useEntities();
   const route = useCurrentRoute();
-  assert(route !== null);
-  assert(route.params != null);
-  assert(data !== null);
-  const issueId = route.params.id;
+  const issueId = route?.params?.id || '';
   const issue = denormalize(data.issues[issueId], ISSUE_SCHEMA, data);
   return (
     <article className="px-4 py-2 my-2 container mx-auto">
