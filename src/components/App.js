@@ -4,16 +4,17 @@ import { Route, Switch, useCurrentRoute } from '@maksimr/ui/react/Router';
 import React, { useCallback } from 'react';
 import { denormalize } from 'normalizr';
 import { ISSUE_SCHEMA } from '../schema';
+import assert from 'assert';
 
 export function App() {
-  const [{ path }] = useStore();
+  const [{path}] = useStore();
   return (
     <Switch path={path}>
       <Route when="/">
-        <IssueList />
+        <IssueList/>
       </Route>
       <Route when="/issue/:id">
-        <Issue />
+        <Issue/>
       </Route>
     </Switch>
   );
@@ -22,14 +23,17 @@ export function App() {
 function Issue() {
   const [data] = useEntities();
   const route = useCurrentRoute();
+  assert(route !== null);
+  assert(route.params != null);
+  assert(data !== null);
   const issueId = route.params.id;
-  const issue = denormalize(data.issues[issueId], ISSUE_SCHEMA);
+  const issue = denormalize(data.issues[issueId], ISSUE_SCHEMA, data);
   return (
     <article className="px-4 py-2 my-2 container mx-auto">
-      <BackButton />
-      <IssueMeta issue={issue} />
-      <IssueSummary issue={issue} />
-      <IssueDescription description={issue.description} />
+      <BackButton/>
+      <IssueMeta issue={issue}/>
+      <IssueSummary issue={issue}/>
+      <IssueDescription description={issue.description}/>
     </article>
   );
 }
@@ -48,29 +52,29 @@ function BackButton() {
 }
 
 function IssueList() {
-  const [data] = useEntities();
-  const [{ issues }] = useCurrentViewState();
+  const [entities] = useEntities();
+  const [{issues}] = useCurrentViewState();
   return (
     <div className="px-4 py-2 my-2 container mx-auto">
       {issues?.map((issueId) => {
-        const issue = denormalize(data.issues[issueId], ISSUE_SCHEMA);
-        return <IssueItem issue={issue} key={issue.idReadable} />;
+        const issue = denormalize(entities.issues[issueId], ISSUE_SCHEMA, entities);
+        return <IssueItem issue={issue} key={issue.idReadable}/>;
       })}
     </div>
   );
 }
 
-function IssueItem({ issue }) {
+function IssueItem({issue}) {
   return (
     <article className="mb-8">
-      <IssueMeta issue={issue} />
-      <IssueSummary issue={issue} />
-      <IssueDescription description={issue.trimmedDescription} />
+      <IssueMeta issue={issue}/>
+      <IssueSummary issue={issue}/>
+      <IssueDescription description={issue.trimmedDescription}/>
     </article>
   );
 }
 
-function IssueSummary({ issue }) {
+function IssueSummary({issue}) {
   return (
     <header className="text-base font-semibold">
       <a href={`/issue/${issue.idReadable}`}>{issue.summary}</a>
@@ -78,11 +82,11 @@ function IssueSummary({ issue }) {
   );
 }
 
-function IssueDescription({ description }) {
+function IssueDescription({description}) {
   return <p className="mt-3 text-base font-light">{description}</p>;
 }
 
-function IssueMeta({ issue }) {
+function IssueMeta({issue}) {
   const [pid, id] = issue.idReadable.split('-');
   return (
     <aside className="mt-1 mb-2 text-gray-600 text-xs font-light">
@@ -95,7 +99,7 @@ function IssueMeta({ issue }) {
       <label>{issue.reporter.fullName}</label>
       {Vdr()}
       <label>
-        <DateTime date={issue.created} />
+        <DateTime date={issue.created}/>
       </label>
     </aside>
   );

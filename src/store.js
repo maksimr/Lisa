@@ -1,9 +1,10 @@
 import { Store } from '@maksimr/ui/Store';
 import { produce } from 'immer';
 import { normalize } from 'normalizr';
+
 /**
  * @typedef AppStore
- * @property {string} [path]
+ * @property {string} path
  * @property {Object} [entities]
  * @property {Object} [view]
  */
